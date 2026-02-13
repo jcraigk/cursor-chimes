@@ -1,6 +1,6 @@
 #!/bin/bash
 # Installs custom chime sounds into Cursor (macOS only).
-# Usage: ./scripts/cursor-chimes-install.sh [sounds_dir]
+# Usage: ./scripts/install-cursor-chimes.sh [sounds_dir]
 #
 # sounds_dir: path to folder containing MP3s (default: ./sounds)
 #
@@ -28,26 +28,26 @@ if [ ${#mp3_files[@]} -eq 0 ]; then
   exit 1
 fi
 
-if grep -q 'zchime1' "$JS_FILE" 2>/dev/null; then
+if grep -q 'custom-chime1' "$JS_FILE" 2>/dev/null; then
   echo "Patch already applied, nothing to do."
   exit 0
 fi
 
 echo "Found ${#mp3_files[@]} sound(s) in $SOUNDS_DIR"
 
-# Copy MP3s as zchime1.mp3, zchime2.mp3, etc.
+# Copy MP3s as custom-chime1.mp3, custom-chime2.mp3, etc.
 i=1
 registrations=""
 sound_refs=""
 for f in "${mp3_files[@]}"; do
-  dest="$MEDIA_DIR/zchime${i}.mp3"
+  dest="$MEDIA_DIR/custom-chime${i}.mp3"
   cp "$f" "$dest"
-  echo "  Copied $(basename "$f") -> zchime${i}.mp3"
-  registrations="${registrations};this.zchime${i}=RB.register({fileName:\"zchime${i}.mp3\"})"
+  echo "  Copied $(basename "$f") -> custom-chime${i}.mp3"
+  registrations="${registrations};this.customChime${i}=RB.register({fileName:\"custom-chime${i}.mp3\"})"
   if [ -n "$sound_refs" ]; then
     sound_refs="${sound_refs},"
   fi
-  sound_refs="${sound_refs}vk.zchime${i}"
+  sound_refs="${sound_refs}vk.customChime${i}"
   i=$((i + 1))
 done
 
@@ -64,7 +64,7 @@ sed -i '' "s/this\.done1=RB\.register({fileName:\"done1\.mp3\"})/this.done1=RB.r
 # Replace chime playSound calls with random selection
 sed -i '' "s/this\.accessibilitySignalService\.playSound(vk\.done1,\!0,/this.accessibilitySignalService.playSound([${sound_refs}][Math.floor(Math.random()*${count})],!0,/g" "$JS_FILE"
 
-if grep -q 'zchime1' "$JS_FILE"; then
+if grep -q 'custom-chime1' "$JS_FILE"; then
   echo "Done! Restart Cursor to hear your custom chimes."
 else
   echo "Patch failed. Restoring backup..."

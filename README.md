@@ -2,12 +2,15 @@
 
 Custom chime sounds for [Cursor](https://cursor.sh). Replace the default "task done" chime with something better.
 
-Cursor plays a short sound when LLM output finishes (if enabled). This repo provides alternative sounds and two ways to install them. Ensure you have "Completion Sound" enabled in Cursor Settings before proceeding.
+Cursor plays a short sound when LLM output finishes (if enabled). This repo provides alternative sounds and a couple of ways to install them. Ensure you have "Completion Sound" enabled in Cursor Settings before proceeding.
 
-> **macOS only.** Cursor stores its sounds at:
-> ```
-> /Applications/Cursor.app/Contents/Resources/app/out/vs/platform/accessibilitySignal/browser/media/done1.mp3
-> ```
+**Note: This works on MacOS only. Instructions for Windows uses may come later.** 
+
+Cursor stores its sounds at:
+
+```
+/Applications/Cursor.app/Contents/Resources/app/out/vs/platform/accessibilitySignal/browser/media/done1.mp3
+```
 
 ## Prerequisites
 
@@ -37,7 +40,7 @@ Restart Cursor. That's it.
 
 Patch Cursor's JavaScript to randomly select from multiple sounds each time the chime plays. This gives you a different sound on every LLM completion.
 
-### Automated Install
+### Install Script
 
 ```bash
 git clone https://github.com/jcraigk/cursor-chimes.git
@@ -46,7 +49,7 @@ cd cursor-chimes
 ```
 
 The script:
-1. Copies all MP3s from `sounds/` into Cursor's media directory
+1. Copies all MP3s from `sounds/` into Cursor's media directory (renamed to `custom-chime1.mp3`, `custom-chime2.mp3`, etc.)
 2. Patches the JS to randomly pick one on each chime
 3. Detects if the patch is already applied (safe to re-run)
 
@@ -58,9 +61,11 @@ You can also point it at a custom folder of MP3s:
 
 Restart Cursor after running. Re-run after each Cursor update.
 
-### Using Cursor AI to Patch
+**Note:** The script uses hardcoded `sed` patterns to patch Cursor's minified JS. If a Cursor update changes variable names in the JS (e.g., `RB` becomes `XB`), the script will fail safely and restore the backup. If that happens, use the AI-assisted fallback below.
 
-Since Cursor updates may change the JS structure, you can ask Cursor's AI agent to apply the patch for you. Paste this prompt into Cursor chat:
+### Fallback: AI-Assisted Patch
+
+If the install script fails after a Cursor update, you can ask Cursor's AI agent to apply the same patch. The AI can read the updated JS and adapt to any renamed variables. Paste this prompt into Cursor chat:
 
 > **Prompt:**
 >
@@ -69,12 +74,10 @@ Since Cursor updates may change the JS structure, you can ask Cursor's AI agent 
 > I have custom MP3 files in this repo's `sounds/` folder.
 >
 > Please:
-> 1. Copy my MP3s into Cursor's media directory at `/Applications/Cursor.app/Contents/Resources/app/out/vs/platform/accessibilitySignal/browser/media/` with names like `zchime1.mp3`, `zchime2.mp3`, etc.
-> 2. In the JS file, find where `done1` is registered as a sound (via `RB.register`) and add registrations for each zchime file.
-> 3. Find the two `playSound` calls that reference `done1` in the chime code (look for `[chimes]` in nearby console.error strings) and replace them with a random selection from the zchime sounds.
+> 1. Copy my MP3s into Cursor's media directory at `/Applications/Cursor.app/Contents/Resources/app/out/vs/platform/accessibilitySignal/browser/media/` with names like `custom-chime1.mp3`, `custom-chime2.mp3`, etc.
+> 2. In the JS file, find where `done1` is registered as a sound and add registrations for each custom-chime file.
+> 3. Find the `playSound` calls that reference `done1` in the chime code and replace them with a random selection from the custom-chime sounds.
 > 4. Back up the JS file before patching.
-
-This approach is resilient to Cursor updates changing variable names or file structure since the AI agent can adapt.
 
 ## Included Sounds
 

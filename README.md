@@ -4,7 +4,7 @@ Custom chime sounds for [Cursor](https://cursor.sh). Replace the default "task d
 
 Cursor plays a short sound when LLM output finishes (if enabled). This repo provides alternative sounds and a couple of ways to install them. Ensure you have "Completion Sound" enabled in Cursor Settings before proceeding.
 
-**Note: This works on MacOS only. Instructions for Windows uses may come later.** 
+**Note: This works on MacOS only. Instructions for Windows uses may come later.**
 
 ## Prerequisites
 
@@ -31,6 +31,8 @@ Restart Cursor. That's it.
 **Downside:** Cursor updates will overwrite your custom sound. Re-run the `cp` after each update.
 
 ## Option 2: Random Sound Rotation
+
+**Warning: Doing this results in a warning from Cursor on startup about corrupt installation. You can safely ignore it but if you're not comfy with that, don't proceed.**
 
 Patch Cursor's JavaScript to randomly select from multiple sounds each time the chime plays. This gives you a different sound on every LLM completion.
 

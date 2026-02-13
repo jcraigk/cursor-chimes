@@ -2,7 +2,7 @@
 
 Custom chime sounds for [Cursor](https://cursor.sh). Replace the default "task done" chime with something better.
 
-Cursor plays a short sound when LLM output finishes (if enabled). This repo provides alternative sounds and two ways to install them.
+Cursor plays a short sound when LLM output finishes (if enabled). This repo provides alternative sounds and two ways to install them. Ensure you have "Completion Sound" enabled in Cursor Settings before proceeding.
 
 > **macOS only.** Cursor stores its sounds at:
 > ```
@@ -11,7 +11,9 @@ Cursor plays a short sound when LLM output finishes (if enabled). This repo prov
 
 ## Prerequisites
 
-Enable the chime in Cursor: **Settings → search "chime" → enable "Composer: Should Chime After Chat Finishes"**.
+Enable the chime in Cursor: **Settings → search "completion" → enable "Completion Sound: Play a sound when agent finishes responding"**.
+
+![Cursor Completion Sound setting](images/cursor-settings-completion-sound.png)
 
 ## Option 1: Single Sound Replacement
 
@@ -40,7 +42,7 @@ Patch Cursor's JavaScript to randomly select from multiple sounds each time the 
 ```bash
 git clone https://github.com/jcraigk/cursor-chimes.git
 cd cursor-chimes
-./scripts/cursor-chimes-install.sh
+./scripts/install-cursor-chimes.sh
 ```
 
 The script:
@@ -51,7 +53,7 @@ The script:
 You can also point it at a custom folder of MP3s:
 
 ```bash
-./scripts/cursor-chimes-install.sh ~/my-sounds
+./scripts/install-cursor-chimes.sh ~/my-sounds
 ```
 
 Restart Cursor after running. Re-run after each Cursor update.
@@ -64,7 +66,7 @@ Since Cursor updates may change the JS structure, you can ask Cursor's AI agent 
 >
 > I want to customize the chime sound that plays when LLM output finishes. The chime code is in `/Applications/Cursor.app/Contents/Resources/app/out/vs/workbench/workbench.desktop.main.js`. It calls `playSound` with a `done1` sound reference for the chime.
 >
-> I have custom MP3 files at `~/.cursor-chimes/` (or you can use the sounds in this repo's `sounds/` folder).
+> I have custom MP3 files in this repo's `sounds/` folder.
 >
 > Please:
 > 1. Copy my MP3s into Cursor's media directory at `/Applications/Cursor.app/Contents/Resources/app/out/vs/platform/accessibilitySignal/browser/media/` with names like `zchime1.mp3`, `zchime2.mp3`, etc.
@@ -80,11 +82,13 @@ This approach is resilient to Cursor updates changing variable names or file str
 |------|-------------|----------|
 | `zelda_botw_1.mp3` | Breath of the Wild sound 1 | ~2.8s |
 | `zelda_botw_2.mp3` | Breath of the Wild sound 2 | ~2.5s |
+| `zelda_orb.mp3` | Zelda orb collected | ~3.0s |
 | `zelda_puzzle.mp3` | Zelda puzzle solved | ~2.3s |
+| `zelda_treasure.mp3` | Zelda treasure chest opened | ~3.0s |
 
 ## Adding Your Own Sounds
 
-Drop any MP3 into the `sounds/` folder. Keep them short (1–3 seconds works best — Cursor may cut off longer sounds). Then re-run the install script.
+Drop any MP3 into the `sounds/` folder. Keep them under 3 seconds — Cursor will cut off longer sounds. Then re-run the install script.
 
 ## Notes
 

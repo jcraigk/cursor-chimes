@@ -35,6 +35,9 @@ fi
 
 echo "Found ${#mp3_files[@]} sound(s) in $SOUNDS_DIR"
 
+# Remove any previously installed custom-chime files
+rm -f "$MEDIA_DIR"/custom-chime*.mp3
+
 # Copy MP3s as custom-chime1.mp3, custom-chime2.mp3, etc.
 i=1
 registrations=""

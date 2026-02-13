@@ -6,12 +6,6 @@ Cursor plays a short sound when LLM output finishes (if enabled). This repo prov
 
 **Note: This works on MacOS only. Instructions for Windows uses may come later.** 
 
-Cursor stores its sounds at:
-
-```
-/Applications/Cursor.app/Contents/Resources/app/out/vs/platform/accessibilitySignal/browser/media/done1.mp3
-```
-
 ## Prerequisites
 
 Enable the chime in Cursor: **Settings → search "completion" → enable "Completion Sound: Play a sound when agent finishes responding"**.
@@ -83,8 +77,7 @@ If the install script fails after a Cursor update, you can ask Cursor's AI agent
 
 | File | Description | Duration |
 |------|-------------|----------|
-| `zelda_botw_1.mp3` | Breath of the Wild sound 1 | ~2.8s |
-| `zelda_botw_2.mp3` | Breath of the Wild sound 2 | ~2.5s |
+| `zelda_botw.mp3` | Breath of the Wild chime | ~2.8s |
 | `zelda_orb.mp3` | Zelda orb collected | ~3.0s |
 | `zelda_puzzle.mp3` | Zelda puzzle solved | ~2.3s |
 | `zelda_treasure.mp3` | Zelda treasure chest opened | ~3.0s |

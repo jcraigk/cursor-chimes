@@ -2,78 +2,78 @@
 
 Custom chime sounds for [Cursor](https://cursor.sh). Replace the default "task done" chime with something better.
 
-Cursor plays a short sound when LLM output finishes (if enabled). This repo provides alternative sounds and a couple of ways to install them. Ensure you have "Completion Sound" enabled in Cursor Settings before proceeding.
+Inspired by [peon-ping](https://github.com/PeonPing/peon-ping).
 
-**Note: This works on MacOS only. Instructions for Windows users may come later.**
 
-## Prerequisites
+### Setup
 
-Enable the chime in Cursor: **Settings → search "completion" → enable "Completion Sound: Play a sound when agent finishes responding"**.
+1. **Disable Cursor's built-in sound** (to avoid double chimes):
 
-![Cursor Completion Sound setting](images/cursor-settings-completion-sound.png)
+Settings → search "completion" → disable "Completion Sound"
 
-## Option 1: Single Sound Replacement
-
-The simplest approach. Pick one MP3 and copy it over the default:
+2. **Clone this repo** (or download it somewhere permanent):
 
 ```bash
-# Back up the original
-cp /Applications/Cursor.app/Contents/Resources/app/out/vs/platform/accessibilitySignal/browser/media/done1.mp3 \
-   ~/done1-original.mp3
-
-# Replace with your chosen sound
-cp sounds/zelda_puzzle.mp3 \
-   /Applications/Cursor.app/Contents/Resources/app/out/vs/platform/accessibilitySignal/browser/media/done1.mp3
+git clone https://github.com/jcraigk/cursor-chimes.git ~/cursor-chimes
 ```
 
-Restart Cursor. That's it.
+3. **Create the hooks config** at `~/.cursor/hooks.json`:
 
-**Downside:** Cursor updates will overwrite your custom sound. Re-run the `cp` after each update.
+```json
+{
+  "hooks": [
+    {
+      "event": "onAgentStop",
+      "command": "bash ~/cursor-chimes/scripts/play-chime.sh"
+    }
+  ]
+}
+```
 
-## Option 2: Random Sound Rotation
+Adjust the path if you cloned elsewhere.
 
-**Warning: Doing this results in a warning from Cursor on startup about corrupt installation. You can safely ignore it but if you're not comfy with that, don't proceed.**
+4. **Restart Cursor.** That's it — you'll hear a random chime when the agent finishes.
 
-Patch Cursor's JavaScript to randomly select from multiple sounds each time the chime plays. This gives you a different sound on every LLM completion.
+### Available Hook Events
 
-### Install Script
+You can trigger sounds on different events by adding more entries to `hooks.json`:
 
+| Event | When it fires |
+|-------|---------------|
+| `onAgentStop` | Agent finishes responding |
+| `onAgentStart` | Agent starts working |
+| `beforeShellExecution` | Before running a shell command |
+| `afterFileEdit` | After editing a file |
+
+Example with multiple events (using different sound folders):
+
+```json
+{
+  "hooks": [
+    {
+      "event": "onAgentStop",
+      "command": "bash ~/cursor-chimes/scripts/play-chime.sh ~/cursor-chimes/sounds"
+    },
+    {
+      "event": "onAgentStart",
+      "command": "bash ~/cursor-chimes/scripts/play-chime.sh ~/cursor-chimes/sounds-start"
+    }
+  ]
+}
+```
+
+### Customizing
+
+The `play-chime.sh` script picks a random MP3 from the sounds directory each time. To use your own sounds:
+
+Add MP3 files to the `sounds/` folder (keep them under 3 seconds). The script will automatically include them in rotation
+
+You can also point the script at a different directory:
 ```bash
-git clone https://github.com/jcraigk/cursor-chimes.git
-cd cursor-chimes
-./scripts/install-cursor-chimes.sh
+bash ~/cursor-chimes/scripts/play-chime.sh /path/to/my/sounds
 ```
 
-The script:
-1. Copies all MP3s from `sounds/` into Cursor's media directory (renamed to `custom-chime1.mp3`, `custom-chime2.mp3`, etc.)
-2. Patches the JS to randomly pick one on each chime
-3. Detects if the patch is already applied (safe to re-run)
-
-You can also point it at a custom folder of MP3s:
-
-```bash
-./scripts/install-cursor-chimes.sh ~/my-sounds
-```
-
-Restart Cursor after running. Re-run after each Cursor update.
-
-**Note:** The script uses hardcoded `sed` patterns to patch Cursor's minified JS. If a Cursor update changes variable names in the JS (e.g., `RB` becomes `XB`), the script will fail safely and restore the backup. If that happens, use the AI-assisted fallback below.
-
-### Fallback: AI-Assisted Patch
-
-If the install script fails after a Cursor update, you can ask Cursor's AI agent to apply the same patch. The AI can read the updated JS and adapt to any renamed variables. Paste this prompt into Cursor chat:
-
-> **Prompt:**
->
-> I want to customize the chime sound that plays when LLM output finishes. The chime code is in `/Applications/Cursor.app/Contents/Resources/app/out/vs/workbench/workbench.desktop.main.js`. It calls `playSound` with a `done1` sound reference for the chime.
->
-> I have custom MP3 files in this repo's `sounds/` folder.
->
-> Please:
-> 1. Copy my MP3s into Cursor's media directory at `/Applications/Cursor.app/Contents/Resources/app/out/vs/platform/accessibilitySignal/browser/media/` with names like `custom-chime1.mp3`, `custom-chime2.mp3`, etc.
-> 2. In the JS file, find where `done1` is registered as a sound and add registrations for each custom-chime file.
-> 3. Find the `playSound` calls that reference `done1` in the chime code and replace them with a random selection from the custom-chime sounds.
-> 4. Back up the JS file before patching.
+---
 
 ## Included Sounds
 
@@ -86,13 +86,13 @@ If the install script fails after a Cursor update, you can ask Cursor's AI agent
 
 ## Adding Your Own Sounds
 
-Drop any MP3 into the `sounds/` folder. Keep them under 3 seconds — Cursor will cut off longer sounds. Then re-run the install script.
+Drop any MP3 into the `sounds/` folder. Keep them under 3 seconds for best results.
 
-## Notes
+## Platform Support
 
-- After patching, Cursor will show a "Your Cursor installation appears to be corrupt" warning on startup. This is safe to dismiss — it's just a checksum mismatch from the modified JS.
-- All changes are confined to the Cursor app bundle and will be reverted on the next Cursor update.
-- The patch does not affect any Cursor functionality beyond the chime sound.
+- **macOS**: Uses `afplay` (built-in)
+- **Linux**: Uses `paplay` (PulseAudio), `pw-play` (PipeWire), or `ffplay` (FFmpeg)
+- **Windows**: Not yet supported
 
 ## License
 
